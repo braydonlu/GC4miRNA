@@ -1,0 +1,5 @@
+In order to generate calculations of the GC Content for multiple miRNAs at once, run the module GC_Calculation_App.R in RStudio,
+and input a fasta file containing your miRNAs. We have an example file called example-2.fa, which generates GC 
+Content for miRNAs found in our dataset. gccontent_fixed.sh is the bash script that our R Shiny program uses for its calculation.
+We would like to credit "Abbys-Amazing-GC-Calculator" for the original code, which we only modified a little bit. It can be found
+in this directory: https://github.com/abbykatb/Abbys-Amazing-GC-Calculator/blob/master/README.md
