@@ -16,3 +16,6 @@ The input file for this module is a csv file containing columns for GC content f
 <p align="center">
 <img src="GC4miRNA_Figure.png">
 </p>
+
+## License
+MIT
