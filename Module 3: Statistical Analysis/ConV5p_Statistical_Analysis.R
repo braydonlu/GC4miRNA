@@ -48,17 +48,13 @@ server <- function(input, output) {
       filter(TCGA.Differential.Expression == "DOWN")
     
     down_con <- as.numeric(sub("%", "", df_down$GC_content.Consensus.Seed.Sequences))
-    print(down_con)
     down_5p  <- as.numeric(sub("%", "", df_down$GC_Content.for.miRNA.Sequence.5p))
-    print(down_5p)
     
     ttest_down_result <- tryCatch({
       t.test(down_con, down_5p)
     }, error = function(e) e$message)
     
     output$ttest_down <- renderPrint({ ttest_down_result })
-    output$down_con <- renderPrint({ down_con })
-    output$down_5p <- renderPrint({ down_5p })
   })
 }
 
