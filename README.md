@@ -19,3 +19,4 @@ The input file for this module is a csv file containing columns for GC content f
 
 ## License
 MIT
+Authors: Braydon Lu and Ian Hou
