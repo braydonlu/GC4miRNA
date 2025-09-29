@@ -55,6 +55,31 @@ ui <- navbarPage(
         verbatimTextOutput("ttest_down")
       )
     )
+  ),
+  tabPanel(
+    "FASTA Generator",
+    titlePanel("miRNA FASTA Generator"),
+    sidebarLayout(
+      sidebarPanel(
+        fileInput("fastaCSV", "Upload CSV File", accept = ".csv"),
+        textInput("cancerName", "Cancer Name (e.g., BLCA)", value = ""),
+        actionButton("genFasta", "Generate FASTA Files"),
+        br(), br(),
+        downloadButton("downloadFastaZip", "Download ZIP of FASTA Files")
+      ),
+      mainPanel(
+        h4("Instructions:"),
+        p("1. Upload a .csv file with columns: 
+           'miRNA_ID', 'Consensus_Seed_Sequence', 
+           'mature_miRNA_sequence_5p', 'TCGA_Differential_Expression'."),
+        p("2. Enter the cancer name (e.g., BLCA)."),
+        p("3. Click 'Generate FASTA Files'."),
+        p("4. Download all generated FASTA files as a ZIP."),
+        br(),
+        h4("Preview of Sequences to be Exported:"),
+        tableOutput("fastaPreview")
+      )
+    )
   )
 )
 
@@ -123,20 +148,23 @@ server <- function(input, output, session) {
     }
   )
   
-  # Server logic for GC Content T-Test Analysis (from ConV5p_Statistical_Analysis.R)
+  # ---- GC Content T-Test Analysis ----
   observeEvent(input$analyze, {
     req(input$csv_file)
     
     # Load CSV
     df <- read.csv(input$csv_file$datapath, stringsAsFactors = FALSE)
     
+    # Normalize column names
+    names(df) <- trimws(names(df))
+    
     # Filter and process "UP"
     df_up <- df %>%
-      filter(TCGA.Differential.Expression == "UP") %>%
-      select(GC_content.Consensus.Seed.Sequences, GC_Content.for.miRNA.Sequence.5p)
+      filter(TCGA_Differential_Expression == "UP") %>%
+      select(GC_content_Consensus_Seed_Sequences, GC_Content_miRNA_Sequence_5p)
     
-    up_con <- as.numeric(sub("%", "", df_up$GC_content.Consensus.Seed.Sequences))
-    up_5p  <- as.numeric(sub("%", "", df_up$GC_Content.for.miRNA.Sequence.5p))
+    up_con <- as.numeric(sub("%", "", df_up$GC_content_Consensus_Seed_Sequences))
+    up_5p  <- as.numeric(sub("%", "", df_up$GC_Content_miRNA_Sequence_5p))
     
     ttest_up_result <- tryCatch({
       t.test(up_con, up_5p)
@@ -146,11 +174,11 @@ server <- function(input, output, session) {
     
     # Filter and process "DOWN"
     df_down <- df %>%
-      select(TCGA.Differential.Expression,GC_content.Consensus.Seed.Sequences, GC_Content.for.miRNA.Sequence.5p) %>%
-      filter(TCGA.Differential.Expression == "DOWN")
+      filter(TCGA_Differential_Expression == "DOWN") %>%
+      select(GC_content_Consensus_Seed_Sequences, GC_Content_miRNA_Sequence_5p)
     
-    down_con <- as.numeric(sub("%", "", df_down$GC_content.Consensus.Seed.Sequences))
-    down_5p  <- as.numeric(sub("%", "", df_down$GC_Content.for.miRNA.Sequence.5p))
+    down_con <- as.numeric(sub("%", "", df_down$GC_content_Consensus_Seed_Sequences))
+    down_5p  <- as.numeric(sub("%", "", df_down$GC_Content_miRNA_Sequence_5p))
     
     ttest_down_result <- tryCatch({
       t.test(down_con, down_5p)
@@ -158,6 +186,98 @@ server <- function(input, output, session) {
     
     output$ttest_down <- renderPrint({ ttest_down_result })
   })
+# ---- FASTA Generator Logic ----
+write_fasta <- function(df, seq_col, cancer_name, type_label, outdir) {
+  for (status in c("UP", "DOWN")) {
+    subset_df <- df[df[["TCGA_Differential_Expression"]] == status, ]
+    
+    # Drop missing/empty sequences
+    subset_df <- subset_df[!is.na(subset_df[[seq_col]]) & trimws(subset_df[[seq_col]]) != "", ]
+    
+    # Deduplicate by miRNA_ID + sequence
+    subset_df <- unique(subset_df[, c("miRNA_ID", seq_col)])
+    
+    fasta_lines <- c()
+    if (nrow(subset_df) > 0) {
+      for (i in 1:nrow(subset_df)) {
+        header <- paste0(">", as.character(subset_df[["miRNA_ID"]][i]))
+        seq <- as.character(subset_df[[seq_col]][i])
+        fasta_lines <- c(fasta_lines, header, seq)
+      }
+    }
+    
+    fname <- paste0(cancer_name, "_", type_label, "_", status, ".fa")
+    fpath <- file.path(outdir, fname)
+    writeLines(as.character(fasta_lines), fpath, useBytes = TRUE)
+  }
 }
 
+fastaTmpZip <- reactiveVal(NULL)
+fastaPreviewData <- reactiveVal(NULL)
+
+observeEvent(input$genFasta, {
+  req(input$fastaCSV)
+  req(input$cancerName)
+  
+  df <- tryCatch({
+    read.csv(input$fastaCSV$datapath, stringsAsFactors = FALSE)
+  }, error = function(e) {
+    showNotification("Error reading CSV file.", type = "error")
+    return(NULL)
+  })
+  if (is.null(df)) return()
+  
+  # Normalize and check required columns
+  names(df) <- trimws(names(df))
+  required_cols <- c("miRNA_ID", "Consensus_Seed_Sequence", 
+                     "mature_miRNA_sequence_5p", "TCGA_Differential_Expression")
+  if (!all(required_cols %in% names(df))) {
+    showNotification("CSV is missing one or more required columns.", type = "error")
+    return()
+  }
+  
+  df[["TCGA_Differential_Expression"]] <- toupper(trimws(as.character(df[["TCGA_Differential_Expression"]])))
+  
+  # Preview counts
+  counts <- data.frame(
+    File = c("Consensus_Up", "Consensus_Down", "Mature_5p_Up", "Mature_5p_Down"),
+    Sequences = c(
+      sum(df[["TCGA_Differential_Expression"]] == "UP"   & !is.na(df[["Consensus_Seed_Sequence"]])       & trimws(df[["Consensus_Seed_Sequence"]]) != ""),
+      sum(df[["TCGA_Differential_Expression"]] == "DOWN" & !is.na(df[["Consensus_Seed_Sequence"]])       & trimws(df[["Consensus_Seed_Sequence"]]) != ""),
+      sum(df[["TCGA_Differential_Expression"]] == "UP"   & !is.na(df[["mature_miRNA_sequence_5p"]]) & trimws(df[["mature_miRNA_sequence_5p"]]) != ""),
+      sum(df[["TCGA_Differential_Expression"]] == "DOWN" & !is.na(df[["mature_miRNA_sequence_5p"]]) & trimws(df[["mature_miRNA_sequence_5p"]]) != "")
+    ),
+    stringsAsFactors = FALSE
+  )
+  fastaPreviewData(counts)
+  
+  # Write FASTA files to temp dir
+  outdir <- tempfile("fasta_out")
+  dir.create(outdir)
+  write_fasta(df, "Consensus_Seed_Sequence", input$cancerName, "Consensus", outdir)
+  write_fasta(df, "mature_miRNA_sequence_5p", input$cancerName, "Mature_5p", outdir)
+  
+  # Zip all
+  zipfile <- file.path(tempdir(), paste0(input$cancerName, "_FASTA_Files.zip"))
+  zip::zip(zipfile, files = list.files(outdir, full.names = TRUE), mode = "cherry-pick")
+  fastaTmpZip(zipfile)
+  
+  showNotification("FASTA files generated successfully!", type = "message")
+})
+
+output$fastaPreview <- renderTable({
+  fastaPreviewData()
+})
+
+output$downloadFastaZip <- downloadHandler(
+  filename = function() {
+    paste0(input$cancerName, "_FASTA_Files.zip")
+  },
+  content = function(file) {
+    req(fastaTmpZip())
+    file.copy(fastaTmpZip(), file)
+  },
+  contentType = "application/zip"
+)
+}
 shinyApp(ui, server)
