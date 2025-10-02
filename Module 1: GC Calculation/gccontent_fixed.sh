@@ -1,3 +1,4 @@
+#Code credit: The orginal code was written by abbykatb: https://github.com/abbykatb/Abbys-Amazing-GC-Calculator
 #!/bin/bash
 
 # Check for input file
