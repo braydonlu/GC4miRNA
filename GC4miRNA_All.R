@@ -161,10 +161,10 @@ server <- function(input, output, session) {
     # Filter and process "UP"
     df_up <- df %>%
       filter(TCGA_Differential_Expression == "UP") %>%
-      select(GC_content_Consensus_Seed_Sequences, GC_Content_miRNA_Sequence_5p)
+      select(norm_GC_Con, norm_GC_5p)
     
-    up_con <- as.numeric(sub("%", "", df_up$GC_content_Consensus_Seed_Sequences))
-    up_5p  <- as.numeric(sub("%", "", df_up$GC_Content_miRNA_Sequence_5p))
+    up_con <- as.numeric(sub("%", "", df_up$norm_GC_Con))
+    up_5p  <- as.numeric(sub("%", "", df_up$norm_GC_5p))
     
     ttest_up_result <- tryCatch({
       t.test(up_con, up_5p)
@@ -175,10 +175,10 @@ server <- function(input, output, session) {
     # Filter and process "DOWN"
     df_down <- df %>%
       filter(TCGA_Differential_Expression == "DOWN") %>%
-      select(GC_content_Consensus_Seed_Sequences, GC_Content_miRNA_Sequence_5p)
+      select(norm_GC_Con, norm_GC_5p)
     
-    down_con <- as.numeric(sub("%", "", df_down$GC_content_Consensus_Seed_Sequences))
-    down_5p  <- as.numeric(sub("%", "", df_down$GC_Content_miRNA_Sequence_5p))
+    down_con <- as.numeric(sub("%", "", df_down$norm_GC_Con))
+    down_5p  <- as.numeric(sub("%", "", df_down$norm_GC_5p))
     
     ttest_down_result <- tryCatch({
       t.test(down_con, down_5p)
