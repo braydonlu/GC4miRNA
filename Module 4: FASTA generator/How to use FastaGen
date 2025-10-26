@@ -1,1 +1,5 @@
-Copy the Fasta Converter into RStudio, and after installing all packages, it should be ready to run. The input file should be in the .csv format with the cancer-specific information about each miRNA within the columns 'miRNA_ID', 'mature_miRNA_sequence_5p', 'TCGA_Differential_Expression'. After inputting the chosen .csv file, input the name of the TCGA cancer that is being investigated. The program should output the FASTA files into a zip file, which becomes a folder when expanded, containing separate FASTA files for DOWN and UP-regulated as well as 5p and 3p miRNA sequences.
+Copy the Fasta Converter into RStudio, and after installing all packages, it should be ready to run. The input file should be in
+the .csv format with the cancer-specific information about each miRNA within the columns 'miRNA_ID', 'mature_miRNA_sequence_5p', 
+'TCGA_Differential_Expression'. After inputting the chosen .csv file, input the name of the TCGA cancer that is being investigated. 
+The program should output the FASTA files into a zip file, which becomes a folder when expanded, containing separate FASTA files 
+for DOWN and UP-regulated as well as 5p and 3p miRNA sequences.
