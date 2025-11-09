@@ -22,6 +22,24 @@ ui <- navbarPage(
   ),
   
   tabPanel(
+    "GC Content T-Test Analysis",
+    titlePanel("GC Content T-Test for miRNA Sequences"),
+    sidebarLayout(
+      sidebarPanel(
+        fileInput("csv_file", "Upload CSV File", accept = ".csv"),
+        actionButton("analyze", "Run T-Tests")
+      ),
+      mainPanel(
+        h4("T-Test Results for 'UP' Expression"),
+        verbatimTextOutput("ttest_up"),
+        
+        h4("T-Test Results for 'DOWN' Expression"),
+        verbatimTextOutput("ttest_down")
+      )
+    )
+  ),
+  
+  tabPanel(
     "miRNA Differential Expression Search",
     titlePanel("miRNA Differential Expression Search"),
     sidebarLayout(
@@ -40,25 +58,8 @@ ui <- navbarPage(
   ),
   
   tabPanel(
-    "GC Content T-Test Analysis",
-    titlePanel("GC Content T-Test for miRNA Sequences"),
-    sidebarLayout(
-      sidebarPanel(
-        fileInput("csv_file", "Upload CSV File", accept = ".csv"),
-        actionButton("analyze", "Run T-Tests")
-      ),
-      mainPanel(
-        h4("T-Test Results for 'UP' Expression"),
-        verbatimTextOutput("ttest_up"),
-        
-        h4("T-Test Results for 'DOWN' Expression"),
-        verbatimTextOutput("ttest_down")
-      )
-    )
-  ),
-  tabPanel(
-    "FASTA Generator",
-    titlePanel("miRNA FASTA Generator"),
+    "miRNA Differential Expression Categorization",
+    titlePanel("miRNA Differential Expression Categorization"),
     sidebarLayout(
       sidebarPanel(
         fileInput("fastaCSV", "Upload CSV File", accept = ".csv"),
