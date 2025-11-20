@@ -24,6 +24,10 @@ The input file for this module is a csv file containing columns for GC content f
 This Module's function is to intake a list of miRNA IDs and output what their differential expression in tumor samples should look like, based on TCGA data. 
 This module comes with one R shiny script, "Identifying_Differential_Expression.R", which takes in an input list containing miRNA IDs, as well as an input of information from dbDEMC, and finds information about the differential expression of each miRNA between tumor and normal samples based on TCGA data. The miRNA list consists of mature miRNA sequences that are in seperate lines, as can be seen in the example file "BLCA_miRNA_list.txt". This program uses data from dbDEMC that can be used to find differential expression information, which is in the 28.5 MB file "miRExpAll.txt.zip". After inputting the miRNA list as well as the expression data, the program should display the desired information.
 
+<p align="center">
+<img src="miRNA_Differential_Expression_Search.png">
+</p>
+
 ## Module 4: miRNA Differential Expression Categorization
 This Module can calculate FASTA files for miRNAs, given their sequences, and it produces separate FASTA files for Up-regulated and Down-regulated miRNAs.
 The input file for this module can just be any data table with the columns specified within the program. Our code searches for columns with very specific names, so it is important for the function of this program to modify the code so that it searches for the same column names in your dataset. After inputting the name of the cancer you are analyzing the miRNA sequences for, it should give you the optionn to download a zip file, which should expand to give you a folder with four files, which are the consensus and 5p miRNAs with differing differential expression. The FASTA files can easily be inputted into MEME to find motifs, but be aware that the consensus sequences may be too short to find motifs with. 
