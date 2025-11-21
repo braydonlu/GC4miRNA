@@ -32,6 +32,10 @@ This module comes with one R shiny script, "Identifying_Differential_Expression.
 This Module can calculate FASTA files for miRNAs, given their sequences, and it produces separate FASTA files for Up-regulated and Down-regulated miRNAs.
 The input file for this module can just be any data table with the columns specified within the program. Our code searches for columns with very specific names, so it is important for the function of this program to modify the code so that it searches for the same column names in your dataset. After inputting the name of the cancer you are analyzing the miRNA sequences for, it should give you the optionn to download a zip file, which should expand to give you a folder with four files, which are the consensus and 5p miRNAs with differing differential expression. The FASTA files can easily be inputted into MEME to find motifs, but be aware that the consensus sequences may be too short to find motifs with. 
 
+<p align="center">
+<img src="miRNA_Differential_Expression_Categorization.png">
+</p>
+
 ## Workflow
 <p align="center">
 <img src="GC4miRNA_Figure.png">
