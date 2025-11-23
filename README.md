@@ -43,7 +43,7 @@ The input file for this module can just be any data table with the columns speci
 
 ## References
 * Abby's Amazing Gc Calculator: https://github.com/abbykatb/Abbys-Amazing-GC-Calculator/blob/master/README.md
-* MEME: Timothy L. Bailey, James Johnson, Charles E. Grant, William S. Noble, "The MEME Suite", Nucleic Acids Research, 43(W1):W39-W49, 2015. [full text]
+* MEME: Timothy L. Bailey, James Johnson, Charles E. Grant, William S. Noble, "The MEME Suite", Nucleic Acids Research, 43(W1):W39-W49, 2015. https://academic.oup.com/nar/article/43/W1/W39/2467905?login=false
 
 ## License
 MIT
