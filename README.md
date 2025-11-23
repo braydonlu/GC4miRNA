@@ -2,6 +2,11 @@
 ## Overview
 MicroRNAs (miRNAs) are small RNA molecules that play a crucial role in regulating gene expression by binding to and degrading targeted mRNAs. Alterations in the binding site between miRNAs and mRNAs can lead to the dysregulation of genes, and a variety of diseases, including cancers. GC content is an important factor in miRNA binding, since high GC content miRNAs are often more stable and may have a stronger affinity for their targets. To reveal the GC content signature for cancer-associated miRNAs, we developed a R Shiny app called GC4miRNA, which calculates GC enrichment and performs statistical analysis for targeting miRNAs and their seed sequences using customized BASH and R scripts. This combined app can be downloaded in its entirety(GC4miRNA_All.R), or modules can also be used individually. 
 
+## Workflow
+<p align="center">
+<img src="GC4miRNA_Figure.png">
+</p>
+
 ## Module 1: GC Content Calculator
 This Module's function is to intake a list of miRNA sequences and output a list of GC content for every sequences. 
 In order to generate calculations of the GC Content for multiple miRNAs at once, run the module GC_Calculation_App.R in RStudio, and input a fasta file containing your miRNAs. We have an example file called example-2.fa, which can be used to generate GC Content for miRNAs found in our dataset.
@@ -34,11 +39,6 @@ The input file for this module can just be any data table with the columns speci
 
 <p align="center">
 <img src="miRNA_Differential_Expression_Categorization.png">
-</p>
-
-## Workflow
-<p align="center">
-<img src="GC4miRNA_Figure.png">
 </p>
 
 ## References
